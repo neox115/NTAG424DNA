@@ -278,15 +278,16 @@ public class EncryptedFileSunCustomKeysActivity extends AppCompatActivity implem
                         }
                     }
 
-                    // write URL template to file 02 (always using UID + counter in PICC data)
+                    // write URL template to file 02 (PICC-only: UID + counter, no encrypted FileData)
                     SDMSettings sdmSettings = new SDMSettings();
                     sdmSettings.sdmEnabled = true;
-                    // key 3: used for PICC data (UID + counter) encryption / MAC
+                    // key 3: used for PICC data (UID + counter) encryption
+                    // key 4: used for MAC (FileReadKey) — サーバ側では KEY4 を MAC 用キーとして使用
                     sdmSettings.sdmMetaReadPerm = ACCESS_KEY3;
-                    // key 4: used for encrypted FILE data (timestamp etc.)
                     sdmSettings.sdmFileReadPerm = ACCESS_KEY4;
                     sdmSettings.sdmReadCounterRetrievalPerm = ACCESS_NONE;
-                    sdmSettings.sdmOptionEncryptFileData = true;
+                    // 今回は暗号化 FileData を使わない（PICC 部分のみで MAC を計算）
+                    sdmSettings.sdmOptionEncryptFileData = false;
 
                     // Always mirror both UID and read counter to satisfy SDMENC requirements
                     sdmSettings.sdmOptionUid = true;
@@ -295,8 +296,8 @@ public class EncryptedFileSunCustomKeysActivity extends AppCompatActivity implem
                     byte[] ndefRecord = null;
                     NdefTemplateMaster master = new NdefTemplateMaster();
                     master.usesLRP = isLrpAuthenticationMode;
-                    // encrypted file data available. The timestamp is 19 bytes long, but we need multiples of 16 for this feature
-                    master.fileDataLength = 32;
+                    // FileData は使用しないため 0 に設定（PICC データのみ）
+                    master.fileDataLength = 0;
 
                     // Use PICC data as encrypted payload (d) and MAC as t, for the server /sun endpoint
                     ndefRecord = master.generateNdefTemplateFromUrlString(
@@ -311,22 +312,7 @@ public class EncryptedFileSunCustomKeysActivity extends AppCompatActivity implem
                         return;
                     }
                     writeToUiAppend(output, "File 02h Writing the NDEF URL Template SUCCESS");
-                    //System.out.println("*** NdefRecord: " + new String(ndefRecord, StandardCharsets.UTF_8));
-                    // write the timestamp data (19 characters long + 5 characters '#1234'
-                    byte[] fileData = (getTimestampLog() + "#1234").getBytes(StandardCharsets.UTF_8);
-                    try {
-                        if (isLrpAuthenticationMode) {
-                            WriteData.run(dnaC, NDEF_FILE_NUMBER, fileData, (87 + 16)); // LRP Encrypted PICC data is 16 bytes longer
-                        } else {
-                            WriteData.run(dnaC, NDEF_FILE_NUMBER, fileData, 87);
-                        }
-                    } catch (IOException e) {
-                        Log.e(TAG, "writeFileData IOException: " + e.getMessage());
-                        writeToUiAppend(output, "File 02h writeFileDataIOException: " + e.getMessage());
-                        writeToUiAppend(output, "Writing the File Data FAILURE, Operation aborted");
-                        return;
-                    }
-                    writeToUiAppend(output, "File 02h Writing the File Data SUCCESS");
+                    // FileData（タイムスタンプ等）は今回使用しないため、追加書き込みは行わない
 
                     // check if we authenticated with the right key - to change the key settings we need the CAR key
                     if (ACCESS_KEY_CAR != ACCESS_KEY_RW) {
