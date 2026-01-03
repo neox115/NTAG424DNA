@@ -278,28 +278,30 @@ public class EncryptedFileSunCustomKeysActivity extends AppCompatActivity implem
                         }
                     }
 
-                    // write URL template to file 02 depending on radio button
+                    // write URL template to file 02 (always using UID + counter in PICC data)
                     SDMSettings sdmSettings = new SDMSettings();
-                    sdmSettings.sdmEnabled = true; // at this point we are just preparing the templated but do not enable the SUN/SDM feature
-                    sdmSettings.sdmMetaReadPerm = ACCESS_KEY3; // Set to a key to get encrypted PICC data
-                    sdmSettings.sdmFileReadPerm = ACCESS_KEY4; // Used to create the MAC and Encrypted File data
-                    sdmSettings.sdmReadCounterRetrievalPerm = ACCESS_NONE; // Not sure what this is for
+                    sdmSettings.sdmEnabled = true;
+                    // key 3: used for PICC data (UID + counter) encryption / MAC
+                    sdmSettings.sdmMetaReadPerm = ACCESS_KEY3;
+                    // key 4: used for encrypted FILE data (timestamp etc.)
+                    sdmSettings.sdmFileReadPerm = ACCESS_KEY4;
+                    sdmSettings.sdmReadCounterRetrievalPerm = ACCESS_NONE;
                     sdmSettings.sdmOptionEncryptFileData = true;
+
+                    // Always mirror both UID and read counter to satisfy SDMENC requirements
+                    sdmSettings.sdmOptionUid = true;
+                    sdmSettings.sdmOptionReadCounter = true;
+
                     byte[] ndefRecord = null;
                     NdefTemplateMaster master = new NdefTemplateMaster();
                     master.usesLRP = isLrpAuthenticationMode;
-                    master.fileDataLength = 32; // encrypted file data available. The timestamp is 19 bytes long, but we need multiples of 16 for this feature
-                    if (rbUid.isChecked()) {
-                        sdmSettings.sdmOptionUid = true;
-                        sdmSettings.sdmOptionReadCounter = false;
-                    } else if (rbCounter.isChecked()) {
-                        sdmSettings.sdmOptionUid = false;
-                        sdmSettings.sdmOptionReadCounter = true;
-                    } else {
-                        sdmSettings.sdmOptionUid = true;
-                        sdmSettings.sdmOptionReadCounter = true;
-                    }
-                    ndefRecord = master.generateNdefTemplateFromUrlString("https://sdm.nfcdeveloper.com/tag?picc_data={PICC}&enc={FILE}&cmac={MAC}", sdmSettings);
+                    // encrypted file data available. The timestamp is 19 bytes long, but we need multiples of 16 for this feature
+                    master.fileDataLength = 32;
+
+                    // Use PICC data as encrypted payload (d) and MAC as t, for the server /sun endpoint
+                    ndefRecord = master.generateNdefTemplateFromUrlString(
+                            "https://od-receive.onrender.com/sun?d={PICC}&t={MAC}",
+                            sdmSettings);
                     try {
                         WriteData.run(dnaC, NDEF_FILE_NUMBER, ndefRecord, 0);
                     } catch (IOException e) {
