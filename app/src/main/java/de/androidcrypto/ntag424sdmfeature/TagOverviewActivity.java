@@ -479,6 +479,18 @@ public class TagOverviewActivity extends AppCompatActivity implements NfcAdapter
                     }
                     writeToUiAppend(output, DnacFileSettingsDumper.run(NDEF_FILE_NUMBER, fileSettings02));
                     writeToUiAppend(output, Constants.SINGLE_DIVIDER);
+                    // SDM settings raw dump (debug for file 2)
+                    if (fileSettings02.sdmSettings != null) {
+                        net.bplearning.ntag424.sdm.SDMSettings s = fileSettings02.sdmSettings;
+                        writeToUiAppend(output,
+                        "SDM raw (file2): " +
+                        "meta=" + s.sdmMetaReadPerm +
+                        ", file=" + s.sdmFileReadPerm +
+                        ", ctrPerm=" + s.sdmReadCounterRetrievalPerm +
+                        ", uid=" + s.sdmOptionUid +
+                        ", ctr=" + s.sdmOptionReadCounter +
+                        ", encFD=" + s.sdmOptionEncryptFileData);
+                    }
 
                     FileSettings fileSettings03;
                     try {
