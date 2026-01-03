@@ -9,11 +9,12 @@ public class Constants {
     public static final byte[] APPLICATION_KEY_1 = Utils.hexStringToByteArray("A1000000000000000000000000000000");
     public static final byte[] APPLICATION_KEY_2 = Utils.hexStringToByteArray("A2000000000000000000000000000000");
 
-    // NOTE: APPLICATION_KEY_3 / 4 are used for SDM (PICC data & FILE data).
-    // Replace the placeholder values below with your real 16-byte AES keys
-    // before building a production app, and NEVER commit the real keys.
-    public static final byte[] APPLICATION_KEY_3 = Utils.hexStringToByteArray("00112233445566778899AABBCCDDEEFF");
-    public static final byte[] APPLICATION_KEY_4 = Utils.hexStringToByteArray("FFEEDDCCBBAA99887766554433221100");
+    // APPLICATION_KEY_3 / 4 are used for SDM (PICC data & FILE data).
+    // 一時的にサーバ側の SUN_ENC_KEY_HEX / SUN_CMAC_KEY_HEX
+    // （"remonn123hiroshi" / "neox2onodalab051"）と同じ 16バイト鍵に合わせています。
+    // 文字列を ASCII → HEX にすると以下の値になります。
+    public static final byte[] APPLICATION_KEY_3 = Utils.hexStringToByteArray("72656D6F6E6E3132336869726F736869");
+    public static final byte[] APPLICATION_KEY_4 = Utils.hexStringToByteArray("6E656F78326F6E6F64616C6162303531");
 
     public static final byte[] MASTER_APPLICATION_KEY_FOR_DIVERSIFYING = Utils.hexStringToByteArray("A9000000000000000000000000000000");
     public static final byte[] SYSTEM_IDENTIFIER_FOR_DIVERSIFYING = Utils.hexStringToByteArray("666F6F");
