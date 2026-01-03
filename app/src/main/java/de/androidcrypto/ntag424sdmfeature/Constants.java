@@ -8,8 +8,13 @@ public class Constants {
     public static final byte[] APPLICATION_KEY_DEFAULT = Utils.hexStringToByteArray("00000000000000000000000000000000");
     public static final byte[] APPLICATION_KEY_1 = Utils.hexStringToByteArray("A1000000000000000000000000000000");
     public static final byte[] APPLICATION_KEY_2 = Utils.hexStringToByteArray("A2000000000000000000000000000000");
-    public static final byte[] APPLICATION_KEY_3 = Utils.hexStringToByteArray("A3000000000000000000000000000000");
-    public static final byte[] APPLICATION_KEY_4 = Utils.hexStringToByteArray("A4000000000000000000000000000000");
+
+    // NOTE: APPLICATION_KEY_3 / 4 are used for SDM (PICC data & FILE data).
+    // Replace the placeholder values below with your real 16-byte AES keys
+    // before building a production app, and NEVER commit the real keys.
+    public static final byte[] APPLICATION_KEY_3 = Utils.hexStringToByteArray("00112233445566778899AABBCCDDEEFF");
+    public static final byte[] APPLICATION_KEY_4 = Utils.hexStringToByteArray("FFEEDDCCBBAA99887766554433221100");
+
     public static final byte[] MASTER_APPLICATION_KEY_FOR_DIVERSIFYING = Utils.hexStringToByteArray("A9000000000000000000000000000000");
     public static final byte[] SYSTEM_IDENTIFIER_FOR_DIVERSIFYING = Utils.hexStringToByteArray("666F6F");
     public static final int APPLICATION_KEY_VERSION_DEFAULT = 0;
